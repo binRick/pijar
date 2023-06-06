@@ -1,0 +1,13 @@
+[Unit]
+Description=Tunnel
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/ubuntu/pijar/tunnel.sh
+User=ubuntu
+Group=ubuntu
+EnvironmentFile=/home/ubuntu/pijar/.env
+
+[Install]
+WantedBy=multi-user.target

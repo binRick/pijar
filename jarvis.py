@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import speech_recognition as sr, openai, asyncio, edge_tts, pyttsx3, os, subprocess
 
-WRITE_AUDIO_FILE = True
-PLAY_AUDIO_WITH_EDGE_TTS = True
+WRITE_AUDIO_FILE = False
+PLAY_AUDIO_WITH_EDGE_TTS = False
 
 VOICE = "en-GB-ThomasNeural"
 OUTPUT_FILE = "message"
@@ -24,6 +24,9 @@ else:
   OS = 'linux'
 
 print(f'Working on {OS}')
+
+def speak_linux_text(t):
+    subprocess.call(["espeak",t])
 
 def play_linux(f):
     subprocess.call(["espeak","-f",f])
@@ -75,6 +78,8 @@ async def _main() -> None:
               print("writing audio file...")
               await communicate.save(f)
               print(f"wrote audio file to {f}!")
+            else:
+              speak_linux_text(reply)
             if PLAY_AUDIO_WITH_EDGE_TTS:
               play_mp3(f)
 

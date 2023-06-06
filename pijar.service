@@ -10,6 +10,8 @@ ExecStart=/home/ubuntu/pijar/jarvis.sh
 StandardInput=tty-force
 StandardOutput=inherit
 StandardError=inherit
+User=ubuntu
+Group=ubuntu
 
 [Install]
 WantedBy=multi-user.target

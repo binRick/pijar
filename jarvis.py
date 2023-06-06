@@ -1,29 +1,46 @@
 #!/usr/bin/env python3
-#Assignment: Python Project 3
-#Joshua Pacheco (JP), 5/28/2023, Jarvis Co-pilot, Python3 project
-#I am estimating this will take 10 hours to code. 5/24/23-5/28/23 It actually took 7.5 hours, as
-#I had issues with Edge_tts, pyyttx3 and getting a key from open.ai
-
-import speech_recognition as sr
-import openai, asyncio, edge_tts, pyttsx3, os, subprocess
+import speech_recognition as sr, openai, asyncio, edge_tts, pyttsx3, os, subprocess
 
 WRITE_AUDIO_FILE = True
-PLAY_AUDIO_WITH_VLC = True
-PLAY_AUDIO_WITH_EDGE_TTS = False
+PLAY_AUDIO_WITH_EDGE_TTS = True
+
 VOICE = "en-GB-ThomasNeural"
 OUTPUT_FILE = "message"
 CHAT_GPT_MODEL="gpt-3.5-turbo-0301"
-openai.api_key = "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"
-VLC_PATH = "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"
-
+openai.api_key = os.environ.get('OPENAI_KEY')
 messages = []
 rec = sr.Recognizer()
 assistant="You are Jarvis assistant. Address me as Sir"
 messages.append({"role": "system", "content": assistant})
 
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
+
+p = subprocess.Popen(["uname", "-a"], stdout=subprocess.PIPE)
+out, err = p.communicate()
+out = out.decode().strip()
+OS = 'unknown'
+if 'Darwin' in out:
+  OS = 'darwin'
+else:
+  OS = 'linux'
+
+print(f'Working on {OS}')
+
+def play_linux(f):
+    subprocess.call(["espeak","-f",f])
+
+def play_darwin(f):
+    print(f"playing audio file {f}!")
+    subprocess.call(["open","-g",f])
+    print(f"played audio file {f}!")
+
+def play_mp3(file):
+    if OS == 'darwin':
+      play_darwin(file)
+    elif OS == 'linux':
+      play_linux(file)
+    else:
+      print(f'Unhanded OS "{OS}"')
+      sys.exit(1)
 
 async def _main() -> None:
     rec = sr.Recognizer()
@@ -58,13 +75,8 @@ async def _main() -> None:
               print("writing audio file...")
               await communicate.save(f)
               print(f"wrote audio file to {f}!")
-              if PLAY_AUDIO_WITH_VLC:
-                subprocess.call([VLC_PATH,f])
             if PLAY_AUDIO_WITH_EDGE_TTS:
-              print("playing audio file")
-              engine.say(reply)
-              engine.runAndWait()
-              print("played audio file")
+              play_mp3(f)
 
 
     except Exception as e:

@@ -6,3 +6,5 @@ setup:
 
 install:
 	cp -prvf pyjar.service /etc/systemd/system/. && systemctl enable pyjar
+install-tunnel:
+	cp -prvf tunnel.service /etc/systemd/system/. && systemctl enable tunnel
